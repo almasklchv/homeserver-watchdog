@@ -23,5 +23,6 @@ jobs:
           ROUTER_HOST: ${{ secrets.ROUTER_HOST }}
           TARGET_MAC: ${{ secrets.TARGET_MAC }}
           CHECK_PORT: ${{ secrets.CHECK_PORT }}
+          WAKE_PORTS: ${{ secrets.WAKE_PORTS || '443,59999,9' }}
         run: |
           python3 watchdog.py
