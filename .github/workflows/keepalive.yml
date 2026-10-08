@@ -17,9 +17,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run Keepalive Action
-        uses: gautamkrishnar/keepalive-workflow@v2
-        with:
-          committer_username: 'github-actions[bot]'
-          committer_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'chore: keepalive to prevent workflow suspension [skip ci]'
+      - name: Update keepalive timestamp
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          date -u +"%Y-%m-%d %H:%M:%S UTC" > .github/keepalive.txt
+          git add .github/keepalive.txt
+          git commit -m "chore: keepalive [skip ci]" || exit 0
+          git push
