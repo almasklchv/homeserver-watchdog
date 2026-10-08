@@ -1,0 +1,25 @@
+name: Keepalive Workflow
+
+on:
+  schedule:
+    # Runs every 25 days to prevent GitHub from pausing scheduled workflows after 60 days
+    - cron: '0 0 */25 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    name: Prevent Inactivity Suspension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Keepalive Action
+        uses: gautamkrishnar/keepalive-workflow@v2
+        with:
+          committer_username: 'github-actions[bot]'
+          committer_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'chore: keepalive to prevent workflow suspension [skip ci]'
