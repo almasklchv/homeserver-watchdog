@@ -1,0 +1,27 @@
+name: Homeserver Cloud Watchdog
+
+on:
+  schedule:
+    # Run every 10 minutes 24/7/365
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check-and-wake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Watchdog Check
+        env:
+          ROUTER_HOST: ${{ secrets.ROUTER_HOST }}
+          TARGET_MAC: ${{ secrets.TARGET_MAC }}
+          CHECK_PORT: ${{ secrets.CHECK_PORT }}
+        run: |
+          python3 watchdog.py
