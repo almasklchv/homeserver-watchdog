@@ -18,11 +18,16 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Run Watchdog Check
+      - name: Run Watchdog Check & Outage Alerting
         env:
           ROUTER_HOST: ${{ secrets.ROUTER_HOST }}
           TARGET_MAC: ${{ secrets.TARGET_MAC }}
           CHECK_PORT: ${{ secrets.CHECK_PORT }}
           WAKE_PORTS: ${{ secrets.WAKE_PORTS || '443,59999,9' }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          SERVER_HEARTBEAT: ${{ vars.SERVER_HEARTBEAT }}
+          SERVER_ALERT_STATE: ${{ vars.SERVER_ALERT_STATE }}
         run: |
           python3 watchdog.py
