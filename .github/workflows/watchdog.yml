@@ -2,13 +2,19 @@ name: Homeserver Cloud Watchdog
 
 on:
   schedule:
-    # Run every 5 minutes (fastest possible interval in GitHub Actions)
+    # Backup cron starter in case the self-dispatching chain is ever interrupted
     - cron: '*/5 * * * *'
   workflow_dispatch:
+
+# Ensure only one active runner and at most one queued next-link exist at any time
+concurrency:
+  group: homeserver-watchdog-singleton
+  cancel-in-progress: false
 
 jobs:
   check-and-wake:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,7 +24,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Run Watchdog Check & Outage Alerting
+      - name: Run 2-Minute Continuous Watchdog & Self-Chaining Loop
         env:
           ROUTER_HOST: ${{ secrets.ROUTER_HOST }}
           TARGET_MAC: ${{ secrets.TARGET_MAC }}
@@ -29,5 +35,7 @@ jobs:
           GH_PAT: ${{ secrets.GH_PAT }}
           SERVER_HEARTBEAT: ${{ vars.SERVER_HEARTBEAT }}
           SERVER_ALERT_STATE: ${{ vars.SERVER_ALERT_STATE }}
+          LOOP_ITERATIONS: '15'
+          LOOP_SLEEP_SEC: '120'
         run: |
-          python3 watchdog.py
+          python3 watchdog.py --loop
